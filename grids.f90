@@ -10,7 +10,7 @@ contains
 subroutine make_grids
 use m_defs
 integer :: i
-real(dp) temp_const, adiabatic_index, mass
+real(dp) :: temp_const, adiabatic_index, mass
 implicit none
 
 namelist /grid_nml/ nrad,rmin,rmax
