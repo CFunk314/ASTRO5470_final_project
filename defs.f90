@@ -1,5 +1,5 @@
 
-module defs
+module m_defs
 implicit none
 
 integer, parameter :: longint = selected_int_kind(16)
@@ -27,4 +27,4 @@ real (dp), parameter :: rsun = 6.9551d10
 real (dp), parameter :: mjup = 1.8987d30
 real (dp), parameter :: rjup = 7.1492d9
 
-end module
+end module m_defs

@@ -1,0 +1,15 @@
+&grid_nml
+  nrad=1024
+  rmin=1.d9
+  rmax=1.d10
+/
+
+&const_nml
+  temp_const=1.d4
+  adiabatic_index=0.5
+  m_planet=1.d0
+/
+
+&init_nml
+  vel0=1.d0
+/

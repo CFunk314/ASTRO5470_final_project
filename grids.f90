@@ -1,20 +1,21 @@
 
 module m_grids
-use m_defs, only :: dp
+use m_defs, only: dp
 integer :: nrad
 real(dp) :: rmin,rmax,cs_squared,gm
 real(dp), allocatable :: rad(:)
 
 contains
 
+
 subroutine make_grids
-use m_defs
-integer :: i
-real(dp) :: temp_const, adiabatic_index, mass
+use m_defs, only: kboltz,cgrav,mjup,mproton
 implicit none
+integer :: i
+real(dp) :: temp_const,adiabatic_index,m_planet
 
 namelist /grid_nml/ nrad,rmin,rmax
-namelist /const_nml/ temp_const,adiabatic_index,m_particle,m_planet
+namelist /const_nml/ temp_const,adiabatic_index,m_planet
 open (12,file='input.nml')
 read (12,nml=grid_nml)
 read (12,nml=const_nml)
@@ -28,7 +29,7 @@ do i=1,nrad
 end do
 
 ! set up sound speed
-cs_squared = adiabatic_index*temp_const*kboltz/m_particle
+cs_squared = adiabatic_index*temp_const*kboltz/mproton
 
 ! set GM value using m_planet in units of mjup
 gm = cgrav*m_planet*mjup
