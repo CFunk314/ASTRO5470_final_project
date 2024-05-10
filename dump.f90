@@ -1,3 +1,5 @@
+! Chase Funkhouser
+! Subroutines for writing data to .data files
 module m_dump
 use m_defs, only: dp
 
@@ -24,13 +26,14 @@ sound_speed = sqrt(cs_squared)/kms
 
 open(16,file='setup.data')
 write(16,*) "nrad=",nrad
-write(16,*) "rmin=",rmin
-write(16,*) "rmax=",rmax
+write(16,*) "rmin(cm)=",rmin
+write(16,*) "rmax(cm)=",rmax
 write(16,*) "temp(K)=",temp_const
 write(16,*) "adiabatic_index=",adiabatic_index
 write(16,*) "m_planet(m_jup)=",m_planet
 write(16,*) "sound_speed(kms)=",sound_speed
 write(16,*) "GM(cgs)=",gm
+write(16,*) "rcrit(cm)=",rcrit
 close(16)
 
 end subroutine dump_all

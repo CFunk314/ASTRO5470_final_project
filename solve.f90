@@ -1,26 +1,26 @@
+! Chase Funkhouser
+! This module provides subroutines for finding the critical radius and solving the boundary value problem
 module m_solve
 use m_defs, only: dp
-real(dp) :: vel0,eps,rcrit
+real(dp) :: eps,rcrit
 real(dp), allocatable :: finvel(:)
 
 contains
 
 
+! set the eps precision for integration from input
 subroutine initialize
-use m_defs, only: kms
-use m_grids, only: nrad
 implicit none
 
-namelist /init_nml/ vel0,eps
+namelist /integ_nml/ eps
 open (12,file='input.nml')
-read (12,nml=init_nml)
+read (12,nml=integ_nml)
 close(12)
-
-vel0=vel0*kms
 
 end subroutine initialize
 
 
+! find the critical radius associated with the provided force, sound speed, and GM
 subroutine find_rcrit
 use m_grids
 implicit none
@@ -45,13 +45,14 @@ do i=1,nrad-1
   endif
 
   if (i.eq.nrad-1) then
-    print *,"no root found! stopping..."
+    print *,"no root found within domain! stopping..."
     stop
   endif
 enddo
 
 rcrit=rad(icrit)
 
+! compare to the parker radius (no force)
 r_parker=gm/2/cs_squared
 print *,"r_parker=",r_parker
 print *,"difference=",rcrit-r_parker
@@ -59,7 +60,7 @@ print *,"difference=",rcrit-r_parker
 end subroutine find_rcrit
 
 
-! solve the problem by integrating from rcrit outwards to both boundaries
+! solve the boundary value problem by integrating from rcrit outwards to both boundaries
 subroutine solve_bvp
 use m_grids
 use m_integrate
@@ -70,20 +71,22 @@ real(dp) :: v0
 if ( .not. allocated(finvel) ) allocate( finvel(nrad) )
 finvel=0.d0
 
+! find the closest index to the critical radius
 icrit=1+floor((nrad-1.0)*(rcrit-rmin)/(rmax-rmin))
 
+! integrate from the critical radius down to rmin
 istart=icrit
 iend=1
-!v0=vel0
 v0=sqrt(cs_squared)*(1.0-1.d-2)
 print *
 call run_integrate(istart,iend,v0,finvel,eps)
 
+! integrate from the critical radius up to rmax
 istart=icrit+1
 iend=nrad
 v0=sqrt(cs_squared)*(1.0+1.d-2)
 print *
-call run_integrate(istart,iend,vel0,finvel,eps)
+call run_integrate(istart,iend,v0,finvel,eps)
 
 end subroutine solve_bvp
 

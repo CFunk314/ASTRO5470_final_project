@@ -1,3 +1,5 @@
+! Chase Funkhouser
+! Main program for solving the wind problem
 program main
 use m_defs
 use m_grids
@@ -8,6 +10,7 @@ implicit none
 print *,"setting up grids..."
 print *
 call make_grids
+call make_force
 call initialize
 
 print *

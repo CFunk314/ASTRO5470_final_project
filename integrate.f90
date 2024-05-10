@@ -1,3 +1,5 @@
+! Chase Funkhouser
+! Subroutines for running the Runge-Kutta 4-5 integration with adaptive stepsize and evaluating the derivative
 module m_integrate
 use m_defs, only: dp
 
