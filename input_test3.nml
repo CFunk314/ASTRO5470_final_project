@@ -1,0 +1,22 @@
+&grid_nml
+  nrad=100000
+  rmin=2.d10
+  rmax=1.d12
+/
+
+&const_nml
+  temp_const=1.d4
+  adiabatic_index=0.5
+  m_planet=1.d0
+  rho_crit=1.d0
+/
+
+&integ_nml
+  eps=1.d-5
+/
+
+&force_nml
+  a0=1.d-5
+  a1=1.d-10
+  a2=1.d-20
+/
