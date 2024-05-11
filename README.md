@@ -177,3 +177,35 @@ This output file contains the parameters set in the initialization of the grids,
 - `GM`: the value of the gravitational constant $G$ times the mass of the planet $M$, in cgs units.
 - `rcrit`: the value of the critical radius as calculated by the code, given the input force parametrization, in cm.
 
+
+# Testing
+
+The code comes with three code tests and a shell script to run all three. Each code test runs the code given an input namelist, such as `input_test1.nml`, and stores outputs. The outputs are tested by the `tests.py` script which takes input command line argument `-t` and a numer 1,2, or 3 for which test to run. 
+
+## Test 1
+This tests the ability of the code to find the Parker sonic point given an input with no force. This is a simple test of the rootfinding algorithm to find a correct root. The Parker point should be located at $GM/2c_s^2$. After running the input file, we can test the output using the command:
+
+```
+python tests.py -t 1
+```
+
+This script will calculate the Parker point analytically given the input parameters in `setup.data` and return if the error between this and the code's critical point is within error defined by `EPS` at the top of the script.
+
+## Test 2
+This tests the ability of the code to find a sonic point that has been shifted by a constant force in the atmosphere. The constant force is specified by the `A0` parameter at the top of `tests.py`, which should match the `a0` parameter from the input namelist. This is the only nonzero force parameter, so the force is constant over radius, allowing for the critical point to be easily solved analytically via a quadratic. After running the input file, we can test the output using the command:
+
+```
+python tests.py -t 2
+```
+
+This script will calculate the shifted critical point analytically given the input parameters in `setup.data` and return if the error between this and the code's critical point is within the error defined by `EPS` at the top of the script.
+
+## Test 3
+This tests the ability of the code to ensure the continuity equation even if the force profile is a more complicated function of radius. The input namelist for this test has nonzero values of all of the force parameters `a0`, `a1`, and `a2`. The code then runs and calculates the mass loss rate $\dot{M}$ within the atmosphere. We can then test to ensure that the mass loss rate is constant over the whole atmosphere using the command:
+
+```
+python tests.py -t 3
+```
+
+This effectively subtracts the maximum mass loss rate from the minimum and ensures that the relative error between them is less than the error `EPS` defined at the top of the script.
+
