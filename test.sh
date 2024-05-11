@@ -4,8 +4,8 @@ start=$(date +%s)
 workingdir=$PWD
 cd ${workingdir}
 
-make '-f' 'clean'
-make '-f' 'Makefile'
+make clean
+make '-f' Makefile
 printf "\nMake complete. Running test 1...\n"
 
 cp input_test1.nml input.nml
@@ -30,7 +30,10 @@ cp input_test3.nml input.nml
 
 python tests.py '-t' '3'
 
-make '-f' 'clean'
+printf "\nTest 3 complete. Cleaning up...\n"
+
+make clean
+rm *.data
 
 end=$(date +%s)
 runtime=$((end-start))

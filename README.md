@@ -154,3 +154,26 @@ The `density` plot will show the density curve in solid blue, with a red horizon
 
 The `mdot` plot is a test for the accuracy of the code. Using the continuity equation, the value of `mdot` through the radius domain should be constant. If the code is workign properly, the resulting plot will show a horizonal blue line as the mass loss rate.
 
+
+# Outputs
+
+After every code run, the resulting data is stored in three tabular .data files: `final_velocity.data`, `density_mdot.data`, and `setup.data`.
+
+## final_velocity.data
+This output file contains the force and final velocity data. The first row starts with a print of the `nrad` value. This value allows programs to easily read the number of rows of data in the file, since the number of rows of data is equal to `nrad`. The second row contains headers for the following columns of data, namely: `rad` for the radius in cm; `force` for the acceleration value $g_l$ at the specified radius in cgs units; and `vel` the velocity at the specified radius in km/s. Note that velocities are output in km/s, while internally the code uses velocities in cm/s.
+
+## density_mdot.data
+This output file contains the density and mdot data. The first row starts witha print of the `nrad` value. This value allows programs to easily read the number of rows of data in the file, since the number of rows of data is equal to `nrad`. The second row contains headers for the following columns of data, namely: `rad` for the radius in cm; `density` for the density in g/cm^3; and `mdot` for the value of $\dot{M}$ the mass loss rate in g/s.
+
+## setup.data
+This output file contains the parameters set in the initialization of the grids, as well as the critical radius determined by the code. The parameters are as follows:
+- `nrad`: the number of radius bins used.
+- `rmin`: the minimum radius used in the code, in cm.
+- `rmax`: the maximum radius used in the code, in cm.
+- `temp`: the isothermal temperature used in the code, in Kelvin.
+- `adiabatic_index`: the adiabatic index used in determining the sound speed.
+- `m_planet`: the mass of the planet to be simulated, in Jupiter masses (for the Jupiter mass used, see `defs.f90`).
+- `sound_speed`: the calculated sound speed used in the code, in km/s
+- `GM`: the value of the gravitational constant $G$ times the mass of the planet $M$, in cgs units.
+- `rcrit`: the value of the critical radius as calculated by the code, given the input force parametrization, in cm.
+

@@ -21,6 +21,8 @@ import matplotlib.pyplot as plt
 import argparse
 
 KMS_TO_CMS=1.e5
+EPS=1.e-4
+A0=1.e-5
 
 
 def read_setup_file(filename):
@@ -81,82 +83,45 @@ def read_density_file(filename):
     return nrad,rad,density,mdot
 
 
-def plot_vel(nrad,rad,vel,cs,gm,rcrit,filename):
-    """ Plot velocity throughout atmosphere. """
-    
-    # plot velocity
-    plt.plot(rad,vel,'b-',label='velocity')
+def test1(cs,gm,rcrit,eps):
+    """ Determines the truth condition of the first test.
+    The first test compares the output from a model with no force to the original Parker solution."""
 
-    # plot the sound speed
-    plt.axhline(y=cs,c='r',linestyle='-',label='sound speed')
-
-    # calculate and plot the Parker radius given sound speed and GM
-    parker=gm/2/(cs*KMS_TO_CMS)**2
-    plt.axvline(x=parker,c='g',linestyle='dashed',label='parker point')
-
-    # plot the actual critical radius
-    plt.axvline(x=rcrit,c='b',linestyle='dotted',label='critical point')
-
-    plt.ylim(-0.5,20)
-    plt.xscale('log')
-    plt.grid()
-    plt.legend(loc='best')
-    plt.xlabel(r'$r\ [cm]$')
-    plt.ylabel(r'$v\ [km/s]$')
-    plt.title('velocity, nrad='+str(nrad))
-    plt.savefig(filename,format='png')
-    plt.show()
-    plt.close()
+    r_parker=gm/2/(cs*KMS_TO_CMS)**2
+    print('Parker radius=',r_parker)
+    print('Critical radius=',rcrit)
+    error = abs(rcrit-r_parker)/r_parker
+    print('Relative error=',error)
+    if error < eps:
+        return True
+    return False
 
 
-def plot_dens(nrad,rad,density,rcrit,filename):
-    """ Plot density throughout atmosphere. """
+def test2(cs,gm,rcrit,g0,eps):
+    """ Returns the truth condition of the second test.
+    This test compares the output from a constant acceleration model to the derived solution."""
 
-    # calculate the closest index to the critical radius
-    diff=np.inf
-    indx=0
-    for i in range(nrad):
-        newdiff=abs(rcrit-rad[i])
-        if newdiff < diff:
-            diff=newdiff
-            indx=i
-    
-    # plot density
-    plt.plot(rad,density,'b-',label='density')
-    
-    # plot critical radius
-    plt.axvline(x=rcrit,c='b',linestyle='dotted',label='critical point')
-
-    # plot density at the critical radius (critical density)
-    plt.axhline(y=density[indx],c='r',linestyle='-',label='critical density')
-    
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.grid()
-    plt.legend(loc='best')
-    plt.xlabel(r'$r\ [cm]$')
-    plt.ylabel(r'$\rho\ [g/cm^3]$')
-    plt.title('density, nrad='+str(nrad))
-    plt.savefig(filename,format='png')
-    plt.show()
-    plt.close()
+    cs2 = (cs*KMS_TO_CMS)**2
+    rtrue = (-2*cs2+np.sqrt(4*cs2**2+4*g0*gm))/(2*g0)
+    print('Analytic critical radius=',rtrue)
+    print('Critical radius=',rcrit)
+    error = abs(rcrit-rtrue)/rtrue
+    print('Relative error=',error)
+    if error < eps:
+        return True
+    return False
 
 
-def plot_mdot(nrad,rad,mdot,filename):
-    """ Plot mdot throughout atmosphere. """
+def test3(mdot,eps):
+    """ Returns the truth condition of the third test.
+    This test ensures that the mdot value is constant over radius, even for large forces."""
 
-    # plot mdot
-    plt.plot(rad,mdot,'b-',label='mdot')
-
-    plt.xscale('log')
-    plt.grid()
-    plt.legend(loc='best')
-    plt.xlabel(r'$r\ [cm]$')
-    plt.ylabel(r'$\dot{M}\ [g/s]$')
-    plt.title('mdot, nrad='+str(nrad))
-    plt.savefig(filename,format='png')
-    plt.show()
-    plt.close()
+    maxmdot = np.max(mdot)
+    minmdot = np.min(mdot)
+    error = abs(maxmdot-minmdot)/minmdot
+    if error < eps:
+        return True
+    return False
 
 
 def main():
@@ -172,16 +137,31 @@ def main():
 
     match (test):
         case '1':
-            nrad,rad,force,vel=read_vel_file(infile)
-            plot_vel(nrad,rad,vel,cs,gm,rcrit,'velocity_plot.png')
+            nrad,rad,force,vel=read_vel_file('final_velocity.data')
+            t1=test1(cs,gm,rcrit,EPS)
+            if t1:
+                print('Test 1 successful within error.')
+            else:
+                print('Test 1 failed.')
+
         case '2':
-            nrad,rad,force,vel=read_vel_file(infile)
-            plot_vel(nrad,rad,vel,cs,gm,rcrit,'velocity_plot.png')
+            nrad,rad,force,vel=read_vel_file('final_velocity.data')
+            t2=test2(cs,gm,rcrit,A0,EPS)
+            if t2:
+                print('Test 2 successful within error.')
+            else:
+                print('Test 2 failed.')
+
         case '3':
-            nrad,rad,density,mdot=read_density_file(infile)
-            plot_mdot(nrad,rad,mdot,'mdot_plot.png')
+            nrad,rad,density,mdot=read_density_file('density_mdot.data')
+            t3=test3(mdot,EPS)
+            if t3:
+                print('Test 3 successful within error.')
+            else:
+                print('Test 3 failed.')
+
         case _:
-            raise ValueError("Not a supported plot type")
+            raise ValueError("Not a supported plot type.")
 
 
 if __name__ == '__main__':
